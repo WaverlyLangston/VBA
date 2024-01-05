@@ -5,17 +5,20 @@ Private Sub AutomatedOutreachButton_Click()
 Dim wsOutreach As Worksheet
 Dim wsArchive As Worksheet
 Dim wsHTML As Worksheet
+
 'Email/Outlook Objects
 Dim OutApp As Outlook.Application
 Dim objOutlookMsg As Outlook.MailItem
 Dim objOutlookRecip As Recipient
 Dim Recipients As Recipients
+
 'Industry/Lead Dictionaries
 Dim EmailDictionary As Object
 Dim FacePicDictionary As Object
 Dim SubjectDictioanry As Object
 Dim LeadNameDictionary As Object
 Dim IndustryList() As Variant
+
 'HTML code building variables
 Dim FollowUp1Body As String
 Dim FollowUp2Body As String
@@ -24,6 +27,7 @@ Dim Separator1 As String
 Dim Separator2 As String
 Dim Separator3 As String
 Dim Outreach As String
+
 'Other
 Dim i As Long
 Dim SendLastRow As Long
@@ -40,47 +44,52 @@ Dim ContactName As String
 Dim FollowUpLastRow As Long
 Dim FollowUpVersion As Long
 
-
 'Establish specific sheet references
+'Sheet where new contacts are listed for sending first round of emails
 Set wsOutreach = ThisWorkbook.Sheets("Automated Outreach")
+'Sheet where content is pasted to after first round emails are sent, source of follow up emails
 Set wsArchive = ThisWorkbook.Sheets("Email Archive")
+'Sheet that stores various HTML code snippets for crafting emails custom to industry of each client
 Set wsHTML = ThisWorkbook.Sheets("HTML Content")
 
 'Industry - Sector Lead Email Dictionary
+'Emails deleted for public upload
 Set EmailDictionary = CreateObject("Scripting.Dictionary")
-EmailDictionary.Add "Advanced Manufacturing", "tfisher@advancect.org"
-EmailDictionary.Add "Aerospace and Defense", "tfisher@advancect.org"
-EmailDictionary.Add "Life Sciences", "tmiller@advancect.org"
-EmailDictionary.Add "Renewable Energy", "fricigliano@advancect.org"
-EmailDictionary.Add "Technology", "fricigliano@advancect.org"
-EmailDictionary.Add "Insurance", "fricigliano@advancect.org"
-EmailDictionary.Add "Financial Services", "fricigliano@advancect.org"
-EmailDictionary.Add "Other", "fricigliano@advancect.org"
-EmailDictionary.Add "BRE", "lmercurio@advancect.org"
+EmailDictionary.Add "Advanced Manufacturing", ""
+EmailDictionary.Add "Aerospace and Defense", ""
+EmailDictionary.Add "Life Sciences", ""
+EmailDictionary.Add "Renewable Energy", ""
+EmailDictionary.Add "Technology", ""
+EmailDictionary.Add "Insurance", ""
+EmailDictionary.Add "Financial Services", ""
+EmailDictionary.Add "Other", ""
+EmailDictionary.Add "BRE", ""
 
 'Industry - Sector Lead Name Dictionary
+'Names deleted for public upload
 Set LeadNameDictionary = CreateObject("Scripting.Dictionary")
-LeadNameDictionary.Add "Advanced Manufacturing", "Ted Fisher"
-LeadNameDictionary.Add "Aerospace and Defense", "Ted Fisher"
-LeadNameDictionary.Add "Life Sciences", "Tim Miller"
-LeadNameDictionary.Add "Renewable Energy", "Francesco Ricigliano"
-LeadNameDictionary.Add "Technology", "Francesco Ricigliano"
-LeadNameDictionary.Add "Insurance", "Francesco Ricigliano"
-LeadNameDictionary.Add "Financial Services", "Francesco Ricigliano"
-LeadNameDictionary.Add "Other", "Francesco Ricigliano"
-LeadNameDictionary.Add "BRE", "Lisa Mercurio"
+LeadNameDictionary.Add "Advanced Manufacturing", ""
+LeadNameDictionary.Add "Aerospace and Defense", ""
+LeadNameDictionary.Add "Life Sciences", ""
+LeadNameDictionary.Add "Renewable Energy", ""
+LeadNameDictionary.Add "Technology", ""
+LeadNameDictionary.Add "Insurance", ""
+LeadNameDictionary.Add "Financial Services", ""
+LeadNameDictionary.Add "Other", ""
+LeadNameDictionary.Add "BRE", ""
 
 'Industry - Sector Lead Headshot Dictionary
+'File locations removed for public upload
 Set FacePicDictionary = CreateObject("Scripting.Dictionary")
-FacePicDictionary.Add "Advanced Manufacturing", "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Ted-Websquare.png"
-FacePicDictionary.Add "Aerospace and Defense", "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Ted-Websquare.png"
-FacePicDictionary.Add "Life Sciences", "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Timwhitebg-Websquare.png"
-FacePicDictionary.Add "Renewable Energy", "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Francesco-Websquare.png"
-FacePicDictionary.Add "Technology", "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Francesco-Websquare.png"
-FacePicDictionary.Add "Insurance", "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Francesco-Websquare.png"
-FacePicDictionary.Add "Financial Services", "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Francesco-Websquare.png"
-FacePicDictionary.Add "Other", "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Francesco-Websquare.png"
-FacePicDictionary.Add "BRE", "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Lisa-Websquare.png"
+FacePicDictionary.Add "Advanced Manufacturing", ""
+FacePicDictionary.Add "Aerospace and Defense", ""
+FacePicDictionary.Add "Life Sciences", ""
+FacePicDictionary.Add "Renewable Energy", ""
+FacePicDictionary.Add "Technology", ""
+FacePicDictionary.Add "Insurance", ""
+FacePicDictionary.Add "Financial Services", ""
+FacePicDictionary.Add "Other", ""
+FacePicDictionary.Add "BRE", ""
 
 'Industry - Email Subject Dictionary
 Set SubjectDictionary = CreateObject("Scripting.Dictionary")
@@ -95,9 +104,6 @@ SubjectDictionary.Add "Other", "US Expansion: Connecticut Opportunity"
 SubjectDictionary.Add "BRE", "Connecticut Business Support"
 
 
-'----------CHECK FOR ISSUES IN NEW OUTREACH DATA BEFORE SENDING ANYTHING----------
-
-'NOTE: CHECK THAT SENDLASTROW FOR ALL COLUMNS IS THE SAME  ----  OR CONVERT NEW EMAIL SECTION TO TABLE FORMAT AND ERROR CHECKS TO SUE TABLE FUNCTIONS
 'Establish range of new data to send new emails
 SendLastRow = wsOutreach.Cells(wsOutreach.rows.Count, "A").End(xlUp).Row
 Set SendDataRange = wsOutreach.Range("A2:D" & SendLastRow)
@@ -153,7 +159,7 @@ End If
 'Confirmation before continuing with emails
 SendConfirm = MsgBox("Are you sure?", vbQuestion + vbYesNo, "Confirmation")
 If SendConfirm = vbNo Then
-    MsgBox "You clicked No.  Exiting the macro.  No Initial emails sent."
+    MsgBox "You clicked No.  Exiting the macro.  No  emails sent."
     Exit Sub
 End If
 
@@ -184,21 +190,6 @@ objOutlookMsg.Subject = SubjectDictionary(Industry)
 'Check which follow up should be sent based on number of date fields filled in
 FollowUpVersion = Application.WorksheetFunction.CountIf(Worksheets("Email Archive").Range(Worksheets("Email Archive").Cells(i, "E"), Worksheets("Email Archive").Cells(i, "H")), "<>")
 
-'OLD VERSION, SLOWER TO DEFINE EACH HTML CODE BEFORE REGARDLESS OF WHAT WILL BE USED, SAVED FOR NOW AS BACKUP IF CURRENT VERSION HAS PROBLEMS
-'Select style dictionary that begins email html code, based on industry
-    'IndustryStyleDict = wsHTML.Shapes(Industry & " Style").TextFrame2.TextRange.Text
-'Create formatting that separates stages of emails, from and subject line depend on industry, date depends on follow up round
-    'Separator1 = wsHTML.Shapes(Industry & " Sep 1").TextFrame2.TextRange.Text & Format(wsArchive.Cells(i, "E"), "dddd, mmmm dd, yyyy at h:mm AM/PM") & wsHTML.Shapes(Industry & " Sep 2").TextFrame2.TextRange.Text & ContactName & wsHTML.Shapes(Industry & " Sep 3").TextFrame2.TextRange.Text & wsArchive.Cells(i, "B").Value & wsHTML.Shapes(Industry & " Sep 4").TextFrame2.TextRange.Text
-    'Separator2 = wsHTML.Shapes(Industry & " Sep 1").TextFrame2.TextRange.Text & Format(wsArchive.Cells(i, "F"), "dddd, mmmm dd, yyyy at h:mm AM/PM") & wsHTML.Shapes(Industry & " Sep 2").TextFrame2.TextRange.Text & ContactName & wsHTML.Shapes(Industry & " Sep 3").TextFrame2.TextRange.Text & wsArchive.Cells(i, "B").Value & wsHTML.Shapes(Industry & " Sep 4").TextFrame2.TextRange.Text
-    'Separator3 = wsHTML.Shapes(Industry & " Sep 1").TextFrame2.TextRange.Text & Format(wsArchive.Cells(i, "G"), "dddd, mmmm dd, yyyy at h:mm AM/PM") & wsHTML.Shapes(Industry & " Sep 2").TextFrame2.TextRange.Text & ContactName & wsHTML.Shapes(Industry & " Sep 3").TextFrame2.TextRange.Text & wsArchive.Cells(i, "B").Value & wsHTML.Shapes(Industry & " Sep 4").TextFrame2.TextRange.Text
-'Email body for each stage of follow up, industry specific but all use contact name in each round, uses company name in follow up 2
-    'FollowUp1Body = wsHTML.Shapes(Industry & " 2.1").TextFrame2.TextRange.Text & ContactName & wsHTML.Shapes(Industry & " 2.2").TextFrame2.TextRange.Text
-    'FollowUp2Body = wsHTML.Shapes(Industry & " 3.1").TextFrame2.TextRange.Text & ContactName & wsHTML.Shapes(Industry & " 3.2").TextFrame2.TextRange.Text & CompanyName & wsHTML.Shapes(Industry & " 3.3").TextFrame2.TextRange.Text
-    'FollowUp3Body = wsHTML.Shapes(Industry & " 4.1").TextFrame2.TextRange.Text & ContactName & wsHTML.Shapes(Industry & " 4.2").TextFrame2.TextRange.Text
-'Email body for initial outreach and signature, industry specific, uses contact name and company name
-    'Outreach = wsHTML.Shapes(Industry & " 1.1").TextFrame2.TextRange.Text & ContactName & wsHTML.Shapes(Industry & " 1.2").TextFrame2.TextRange.Text & CompanyName & wsHTML.Shapes(Industry & " 1.3").TextFrame2.TextRange.Text
-
-
 'Select follow up stage
 Select Case FollowUpVersion
 
@@ -211,12 +202,13 @@ Case 1
     Outreach = wsHTML.Shapes(Industry & " 1.1").TextFrame2.TextRange.Text & ContactName & wsHTML.Shapes(Industry & " 1.2").TextFrame2.TextRange.Text & CompanyName & wsHTML.Shapes(Industry & " 1.3").TextFrame2.TextRange.Text
     objOutlookMsg.HTMLBody = IndustryStyleDict & FollowUp1Body & Separator1 & Outreach
     'Add images as invisible attachments so they will display in email signature
+    'File paths removed for public upload
     objOutlookMsg.Attachments.Add FacePicDictionary(Industry), 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Logo.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Phone.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Envelope.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Linkedin.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Chevron.png", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
     'Toggle for Send or Display email
     objOutlookMsg.Send
     'Update next date field
@@ -233,12 +225,13 @@ Case 2
     Outreach = wsHTML.Shapes(Industry & " 1.1").TextFrame2.TextRange.Text & ContactName & wsHTML.Shapes(Industry & " 1.2").TextFrame2.TextRange.Text & CompanyName & wsHTML.Shapes(Industry & " 1.3").TextFrame2.TextRange.Text
     objOutlookMsg.HTMLBody = IndustryStyleDict & FollowUp2Body & Separator2 & FollowUp1Body & Separator1 & Outreach
     'Add images as invisible attachments so they will display in email signature
+    'File paths removed for public upload
     objOutlookMsg.Attachments.Add FacePicDictionary(Industry), 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Logo.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Phone.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Envelope.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Linkedin.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Chevron.png", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
     'Toggle for Send or Display email
     objOutlookMsg.Send
     wsArchive.Cells(i, "G").Value = Now()
@@ -256,12 +249,13 @@ Case 3
     Outreach = wsHTML.Shapes(Industry & " 1.1").TextFrame2.TextRange.Text & ContactName & wsHTML.Shapes(Industry & " 1.2").TextFrame2.TextRange.Text & CompanyName & wsHTML.Shapes(Industry & " 1.3").TextFrame2.TextRange.Text
     objOutlookMsg.HTMLBody = IndustryStyleDict & FollowUp3Body & Separator3 & FollowUp2Body & Separator2 & FollowUp1Body & Separator1 & Outreach
     'Add images as invisible attachments so they will display in email signature
+    'File paths removed for public upload
     objOutlookMsg.Attachments.Add FacePicDictionary(Industry), 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Logo.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Phone.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Envelope.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Linkedin.png", 1, 0
-    objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Chevron.png", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
+    objOutlookMsg.Attachments.Add "", 1, 0
     'Toggle for Send or Display email
     objOutlookMsg.Send
     wsArchive.Cells(i, "H").Value = Now()
@@ -298,12 +292,13 @@ objOutlookMsg.Subject = SubjectDictionary(Industry)
 objOutlookMsg.HTMLBody = wsHTML.Shapes(Industry & " Style").TextFrame2.TextRange.Text & wsHTML.Shapes(Industry & " 1.1").TextFrame2.TextRange.Text & ContactName & wsHTML.Shapes(Industry & " 1.2").TextFrame2.TextRange.Text & CompanyName & wsHTML.Shapes(Industry & " 1.3").TextFrame2.TextRange.Text
 
 'Add images as invisible attachments so they will display in email signature
+'File paths removed for public upload
 objOutlookMsg.Attachments.Add FacePicDictionary(Industry), 1, 0
-objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Logo.png", 1, 0
-objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Phone.png", 1, 0
-objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Envelope.png", 1, 0
-objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Linkedin.png", 1, 0
-objOutlookMsg.Attachments.Add "C:\Users\ChooseConnecticut\AdvanceCT\Business Development - Email Content\Chevron.png", 1, 0
+objOutlookMsg.Attachments.Add "", 1, 0
+objOutlookMsg.Attachments.Add "", 1, 0
+objOutlookMsg.Attachments.Add "", 1, 0
+objOutlookMsg.Attachments.Add "", 1, 0
+objOutlookMsg.Attachments.Add "", 1, 0
 
 'Toggle for Send or Display email
 objOutlookMsg.Send
@@ -315,20 +310,6 @@ wsArchive.rows("2:" & SendLastRow).Insert Shift:=xlDown, CopyOrigin:=xlFormatFro
 SendDataRange.Copy Destination:=wsArchive.Range("A2")
 wsArchive.Range("E2:E" & SendLastRow).Cells.Value = Now()
 SendDataRange.ClearContents
-
-'ARCHIVE FUNCTION
-
-'Set InitialOutreach = ThisWorkbook.Worksheets(" 'Send Emails' ").ListObjects("Outreach")
-'Set Archive = ThisWorkbook.Worksheets(" 'Email Archive' ").ListObjects("Archive")
-'LastRow = Application.WorksheetFunction.CountA(InitialOutreach.ListColumns("Contact First Name").DataBodyRange)
-
-'For i = 0 To LastRow - 1
-'    Archive.ListRows.Add 1
-'Next
-
-'InitialOutreach.Range("A2:D" & LastRow + 1).Copy Destination:=Archive.Range("A2")
-
-'InitialOutreach.DataBodyRange.ClearContents
 
 MsgBox "All emails sent successfully."
 Set OutApp = Nothing
